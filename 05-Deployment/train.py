@@ -111,7 +111,7 @@ for train_idx, val_idx in kfold.split(df_full_train):
     scores.append(auc)
     
     print(f"auc of fold {fold} is {auc}")
-    fold = fold + 1
+    fold += 1
 
 print('validation results: ')
 print('C=%s %.3f +- %.3f' % (C, np.mean(scores), np.std(scores)))
