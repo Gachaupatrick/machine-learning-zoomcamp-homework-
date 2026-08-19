@@ -1,62 +1,39 @@
 import pickle
 
-model_file = 'model_C=1.0.bin'
+from flask import Flask
+from flask import request
+from flask import jsonify #turn python dict in our result back to jyson
 
-with open(model_file, 'rb') as f_in: #change wb to rb for reading
+
+model_file = "model_C=1.0.bin"
+
+with open(model_file, "rb") as f_in: #change wb to rb for reading
     dv, model = pickle.load(f_in)
     
+app = Flask("churn")
 
-customer = {
-    'gender': 'female',
-    'seniorcitizen': 0,
-    'partner': 'yes',
-    'dependents': 'no',
-    'phoneservice': 'no',
-    'multiplelines': 'no_phone_service',
-    'internetservice': 'dsl',
-    'onlinesecurity': 'no',
-    'onlinebackup': 'yes',
-    'deviceprotection': 'no',
-    'techsupport': 'no',
-    'streamingtv': 'no',
-    'streamingmovies': 'no',
-    'contract': 'month-to-month',
-    'paperlessbilling': 'yes',
-    'paymentmethod': 'electronic_check',
-    'tenure': 1,
-    'monthlycharges': 29.85,
-    'totalcharges': 29.85
-}
-X = dv.transform([customer])
-y_pred = model.predict_proba(X)[0, 1]
-print('input:', customer)
-print('churn probability:', y_pred)
+@app.route("/predict", methods=["POST"])
+def predict():
+    customer = request.get_json()  #will get the json file below and return it as a python dictionary 
+    
+    X = dv.transform([customer]) #in a real project, this would be put inside a separate function
+    y_pred = model.predict_proba(X)[0, 1] #This returns a NumPy float type
+    churn = y_pred >= 0.5 #we make the decision ourselves and this returns a NumPy boolean type
+    
+    result = {
+        
+        # Cast both values explicitly to standard Python float() and bool() types inside your dictionary
+        # Why : because Flask is returning a NumPy boolean or float type, which standard Python jsonify cannot serialize into JSON.
+        'churn_probability': float(y_pred), #the result is numpy and 
+        'churn':bool(churn)
+        
+    }
+    
+    return jsonify(result)
 
-### Making requests
-import requests
-url = 'http://localhost:9696/predict'
-customer = {
-    'gender': 'female',
-    'seniorcitizen': 0,
-    'partner': 'yes',
-    'dependents': 'no',
-    'phoneservice': 'no',
-    'multiplelines': 'no_phone_service',
-    'internetservice': 'dsl',
-    'onlinesecurity': 'no',
-    'onlinebackup': 'yes',
-    'deviceprotection': 'no',
-    'techsupport': 'no',
-    'streamingtv': 'no',
-    'streamingmovies': 'no',
-    'contract': 'two_year',
-    'paperlessbilling': 'yes',
-    'paymentmethod': 'electronic_check',
-    'tenure': 1,
-    'monthlycharges': 29.85,
-    'totalcharges': 29.85
-}
-response = requests.post(url, json=customer).json()
-response
-if response['churn']:
-    print('sending email to', 'asdx-123d')
+if __name__ == "__main__":
+    # Execute when the module is not initialized from an import statement.
+    app.run(host= "127.0.0.1", debug=True, port=9696)
+    
+#the information with be sent and received in JSON format that uses double quotes instead of single qoutes
+  

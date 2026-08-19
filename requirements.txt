@@ -1,0 +1,31 @@
+# Core Data Analysis
+pandas>=2.0.0
+numpy>=1.24.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+scikit-learn>=1.2.0
+statsmodels>=0.14.0
+lightgbm>=4.0.0
+xgboost>=2.0.0
+pingouin>=0.5.3
+flask>=3.0.0
+gunicorn>=21.2.0
+waitress>=3.0.0
+
+# Jupyter Environment
+jupyter>=1.0.0
+ipykernel>=6.0.0
+
+# Data Collection and APIs
+requests>=2.28.0
+python-dotenv>=1.0.0
+
+# AI and ML Tools
+langchain>=0.1.0
+openai>=1.0.0
+transformers>=4.30.0
+
+# Utilities
+tqdm>=4.65.0
+python-dateutil>=2.8.2
+pytz>=2023.3
